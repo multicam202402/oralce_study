@@ -1,0 +1,146 @@
+SQL> --오라클 설치와 동시에 자동으로 생성되어 있는 계정 중
+SQL> --오라클을 관리 및 운영하는 막강한 권한을 가진 계정을
+SQL> --관리자 계정이라 하고, 이중 최상위 권한자를 sys, sys만큼은
+SQL> --아니지만, 하위의 관리자를 system 이라 함
+SQL> --현재 접속한 계정이 무엇인지 묻기
+SQL> show user
+USER is ""
+SQL> --show user의 결과가 아무것도 없으므로, 재 접속해보자
+SQL> connect system/1234
+Connected.
+SQL> show user
+USER is "SYSTEM"
+SQL> -- 프로젝트 에서 사용할 데이터베이스를 구축해보자
+SQL> --특히 오라클에서 사용하는 데이터베이스 파일의 확장자는 dbf를사용
+SQL> --주의할점 : 오라클 데이터베이스 파일을 생성 위치는 아무곳이나 두면 --안됨 , 지정한 위치에 하자
+SQL> CREATE  TABLESPACE  MYSPACE
+  2  DATAFILE  'D:\oraclexe\app\oracle\oradata\XE\MYSPACE.DBF'
+  3  SIZE 2M;
+
+Tablespace created.
+
+SQL> --생성된 데이터베이스를 사용할 계정을 새로 만들자
+SQL> --단, 계정을 만들기 위해서는 막강한 권한이 필요하므로, 당연히
+SQL> --SYSTEM 이상의 계정으로 로그인되어 잇어야 함
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> CREATE  USER  BATMAN
+  2  IDENTIFIED BY 1234
+  3  DEFAULT  TABLESPACE  MYSPACE
+  4  QUOTA  UNLIMITED  ON  MYSPACE;
+
+User created.
+
+SQL> --유저를 생성했다는 이유만으로, 오라클에 맘대로 접속할 수 있는게
+SQL> --아니다, 결국 관리자 계정에서 접속 권한도 부여해야 한다
+SQL> GRANT  CREATE  SESSION TO BATMAN;
+
+Grant succeeded.
+
+SQL> --현재 계정에서 다른 계정으로 접속을 전환하는 방법
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --BATMAN  계정으로 전환
+SQL> CONNECT BATMAN/1234
+Connected.
+SQL> --여기 까지가 , 프로젝트 진행시 신규로 DB 구축 및 사용자를 만드는 실습
+SQL> show user
+USER is "BATMAN"
+SQL> CREATE  TABLE  MEMBER(
+  2  NAME VARCHAR2(20)
+  3  );
+CREATE  TABLE  MEMBER(
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> --사용자를 사용하고, 접속권한을 부여받앗다고 하여 오라클에서 테이블을
+SQL> --생성할 수는 없다. 결론) 테이블에 대한 권한을 관리자로부터 부여 받자
+SQL> SHOW USER
+USER is "BATMAN"
+SQL> --다시 시스템 관리자 로 ㅈ접속 전환하자
+SQL> CONN  SYSTEM/1234
+Connected.
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --유저에게 테이블권한 부여하기
+SQL> GRANT  CREATE TABLE  TO  BATMAN;
+
+Grant succeeded.
+
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --다시 BATMAN 으로 전환
+SQL> CONN BATMAN/1234
+Connected.
+SQL> SHOW USER
+USER is "BATMAN"
+SQL> CREATE  TABLE  MEMBER(
+  2  -- 표구성 에 대한 설명
+  3  NAME VARCHAR2(20)
+  4  , PHONE  VARVCHAR2(13)
+  5  , AREA VARCHAR2(20)
+  6  );
+, AREA VARCHAR2(20)
+   *
+ERROR at line 5:
+ORA-00907: missing right parenthesis 
+
+
+SQL> EDIT
+Wrote file afiedt.buf
+
+  1  CREATE  TABLE  MEMBER(
+  2  -- 표구성 에 대한 설명
+  3  NAME VARCHAR2(20)
+  4  , PHONE  VARCHAR2(13)
+  5  , AREA VARCHAR2(20)
+  6* )
+SQL> RUN
+  1  CREATE  TABLE  MEMBER(
+  2  -- 표구성 에 대한 설명
+  3  NAME VARCHAR2(20)
+  4  , PHONE  VARCHAR2(13)
+  5  , AREA VARCHAR2(20)
+  6* )
+
+Table created.
+
+SQL> --데이터베이스 시스템만이 이해하는 언어를 가리켜 SQL문이라 한다
+SQL> --생성된 테이블에 데이터를 넣자
+SQL> INSERT INTO MEMBER(NAME, PHONE, AREA)
+  2  VALUES('BATMAN','011', 'KOREA');
+
+1 row created.
+
+SQL> --들어간 데이터 조회해보자
+SQL> SELECT NAME, PHONE, AREA FROM  MEMBER;
+
+NAME                                     PHONE                                  
+---------------------------------------- --------------------------             
+AREA                                                                            
+----------------------------------------                                        
+BATMAN                                   011                                    
+KOREA                                                                           
+                                                                                
+
+SQL> SELECT NAME, PHONE, AREA FROM  MEMBER;
+
+NAME                                     PHONE                                  
+---------------------------------------- --------------------------             
+AREA                                                                            
+----------------------------------------                                        
+BATMAN                                   011                                    
+KOREA                                                                           
+                                                                                
+
+SQL> -- 보여질 데이터의 공간창이 너무 작으면, SQLPLUS 툴 자체의 세팅을 바꿔자
+SQL> SET LINESIZE 250
+SQL> SELECT NAME, PHONE, AREA FROM  MEMBER;
+
+NAME                                     PHONE                      AREA                                                                                                                                                                                  
+---------------------------------------- -------------------------- ----------------------------------------                                                                                                                                              
+BATMAN                                   011                        KOREA                                                                                                                                                                                 
+
+SQL> SPOOL OFF
