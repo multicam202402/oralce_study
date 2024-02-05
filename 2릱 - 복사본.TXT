@@ -1,0 +1,204 @@
+SQL> --   ,    ,,
+SQL> --拙 拙 拙?拙
+SQL> --릱 릱 릱?릱 릱?릱 릱 ?
+SQL> --    
+SQL> --릱릱릱 릱?릱 릱릱 릱릱릱?릱
+SQL> --젨젨?젨젨젨?젨..젨 젨?..
+SQL> --契契?契? 契 契?契?契?契?契
+SQL> --拙?拙拙 拙?拙拙 DBA_ ?拙拙 拙?拙
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --젨?젨?젨 젨 젨?젨?젨
+SQL> SELECT USER_NAME FROM DBA_USERS;
+SELECT USER_NAME FROM DBA_USERS
+       *
+ERROR at line 1:
+ORA-00904: "USER_NAME": invalid identifier 
+
+
+SQL> SELECT USERNAME FROM DBA_USERS;
+
+USERNAME                                                                        
+------------------------------------------------------------                    
+SYS                                                                             
+SYSTEM                                                                          
+ANONYMOUS                                                                       
+TEST                                                                            
+BATMAN                                                                          
+APEX_PUBLIC_USER                                                                
+FLOWS_FILES                                                                     
+APEX_040000                                                                     
+OUTLN                                                                           
+DIP                                                                             
+ORACLE_OCM                                                                      
+
+USERNAME                                                                        
+------------------------------------------------------------                    
+XS$NULL                                                                         
+MDSYS                                                                           
+CTXSYS                                                                          
+DBSNMP                                                                          
+XDB                                                                             
+APPQOSSYS                                                                       
+HR                                                                              
+
+18 rows selected.
+
+SQL> --BATMAN pppp ppp ppppp _
+SQL> CONN BATMAN/1234
+Connected.
+SQL> SHOW USER
+USER is "BATMAN"
+SQL> --00 000 000 0000 000, 00000 00000 0000
+SQL> --pp USER_ p pp
+SQL> SELECT TABLE_NAME FROM USER_TABLES;
+
+TABLE_NAME                                                                      
+------------------------------------------------------------                    
+MEMBER                                                                          
+
+SQL> --  , , , 
+SQL> --@@@ @@@@ @@@@ @@@@ SQL@@@ @@@@ DML @@ @@
+SQL> --DATA  MANIPULATION LANGUAGE(릱?릱?
+SQL> --젨 젨 젨?젨?
+SQL> CREATE  TABLE  FRUIT(
+  2    fruit_name varchar2(15)
+  3   , price  number
+  4   , loc varchar2(15)
+  5  );
+
+Table created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  CREATE  TABLE  FRUIT(
+  2    fruit_name varchar2(15)
+  3   , price  number
+  4   , loc varchar2(15)
+  5* )
+SQL> --릱?릱릱 릱?4?릱
+SQL> --拙 拙?拙 , 拙?拙拙 拙?拙 拙
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('apple',5000,'korea');
+
+1 row created.
+
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('graph',20000,'france');
+
+1 row created.
+
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('kiwi',8000,'aust');
+
+1 row created.
+
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('mango',12000,'africa');
+
+1 row created.
+
+SQL> --릱릱 릱 릱릱? 릱릱?
+SQL> SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+mango                               12000 africa                                
+
+SQL> --젨 젨?젨젨 젨젨, 젨젨 젨젨?
+SQL> --DML 契契 UPDATE ?契契
+SQL> --릱?릱 릱 릱릱 릱릱?
+SQL> CREATE  TABLE  FRUIT2
+  2  AS
+  3  SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+Table created.
+
+SQL> --릱릱 릱 릱릱 릱릱 FRUIT ?릱릱?
+SQL> UPDATE  FRUIT SET PRICE=1000;
+
+4 rows updated.
+
+SQL> SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                1000 korea                                 
+graph                                1000 france                                
+kiwi                                 1000 aust                                  
+mango                                1000 africa                                
+
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+mango                               12000 africa                                
+
+SQL> --契?契契 契? 契 契契 契?契?
+SQL> --PPP PPP PPP PP
+SQL> UPDATE  FRUIT  SET PRICE=1000 WHERE FRUIT_NAME='kiwi';
+
+1 row updated.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 1000 aust                                  
+mango                               12000 africa                                
+
+SQL> --ppp pppp pppp ppppp
+SQL> update fruit set loc='japan' where loc='korea';
+
+1 row updated.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 japan                                 
+graph                               20000 france                                
+kiwi                                 1000 aust                                  
+mango                               12000 africa                                
+
+SQL> --薛薛 薛?薛
+SQL> --
+SQL> delete fruit;
+
+4 rows deleted.
+
+SQL> rollback;
+
+Rollback complete.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+mango                               12000 africa                                
+
+SQL> delete fruit where fruit_name='mango';
+
+1 row deleted.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+
+SQL> spool off

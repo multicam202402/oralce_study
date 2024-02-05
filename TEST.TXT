@@ -1,0 +1,2 @@
+SQL> --한글이 깨질까?
+SQL> SPOOL OFF

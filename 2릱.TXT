@@ -1,0 +1,204 @@
+SQL> --€€ €€€ €€€ €€€€, €€€€ €€€€ €€ ,€€,
+SQL> --ðð ðð ððð ðð
+SQL> --       ?
+SQL> --€€€ €€ €€€€ €€€€ €
+SQL> --     
+SQL> --                ..      ...
+SQL> --ÐÐÐÐÐ ÐÐÐ, ÐÐ ÐÐÐ ÐÐÐ ÐÐÐ ÐÐÐ ÐÐ
+SQL> --ððð ðððð ððð ðððð DBA_ ð ðððð ððð ðð
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --                        
+SQL> SELECT USER_NAME FROM DBA_USERS;
+SELECT USER_NAME FROM DBA_USERS
+       *
+ERROR at line 1:
+ORA-00904: "USER_NAME": invalid identifier 
+
+
+SQL> SELECT USERNAME FROM DBA_USERS;
+
+USERNAME                                                                        
+------------------------------------------------------------                    
+SYS                                                                             
+SYSTEM                                                                          
+ANONYMOUS                                                                       
+TEST                                                                            
+BATMAN                                                                          
+APEX_PUBLIC_USER                                                                
+FLOWS_FILES                                                                     
+APEX_040000                                                                     
+OUTLN                                                                           
+DIP                                                                             
+ORACLE_OCM                                                                      
+
+USERNAME                                                                        
+------------------------------------------------------------                    
+XS$NULL                                                                         
+MDSYS                                                                           
+CTXSYS                                                                          
+DBSNMP                                                                          
+XDB                                                                             
+APPQOSSYS                                                                       
+HR                                                                              
+
+18 rows selected.
+
+SQL> --BATMAN pppp ppp ppppp _
+SQL> CONN BATMAN/1234
+Connected.
+SQL> SHOW USER
+USER is "BATMAN"
+SQL> --00 000 000 0000 000, 00000 00000 0000
+SQL> --pp USER_ p pp
+SQL> SELECT TABLE_NAME FROM USER_TABLES;
+
+TABLE_NAME                                                                      
+------------------------------------------------------------                    
+MEMBER                                                                          
+
+SQL> --€€€ €€€€ €€€€, €€€€€, €€,€€ €€€
+SQL> --@@@ @@@@ @@@@ @@@@ SQL@@@ @@@@ DML @@ @@
+SQL> --DATA  MANIPULATION LANGUAGE( )
+SQL> --              
+SQL> CREATE  TABLE  FRUIT(
+  2    fruit_name varchar2(15)
+  3   , price  number
+  4   , loc varchar2(15)
+  5  );
+
+Table created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  CREATE  TABLE  FRUIT(
+  2    fruit_name varchar2(15)
+  3   , price  number
+  4   , loc varchar2(15)
+  5* )
+SQL> --   4 
+SQL> --ðð ððð ðð , ððð ðððð ððð ðð ðð
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('apple',5000,'korea');
+
+1 row created.
+
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('graph',20000,'france');
+
+1 row created.
+
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('kiwi',8000,'aust');
+
+1 row created.
+
+SQL> INSERT INTO FRUIT(FRUIT_NAME, PRICE, LOC) VALUES('mango',12000,'africa');
+
+1 row created.
+
+SQL> --  ,  
+SQL> SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+mango                               12000 africa                                
+
+SQL> --                ,            
+SQL> --DML ÐÐÐÐ UPDATE Ð ÐÐÐÐ
+SQL> --     
+SQL> CREATE  TABLE  FRUIT2
+  2  AS
+  3  SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+Table created.
+
+SQL> --    FRUIT   
+SQL> UPDATE  FRUIT SET PRICE=1000;
+
+4 rows updated.
+
+SQL> SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                1000 korea                                 
+graph                                1000 france                                
+kiwi                                 1000 aust                                  
+mango                                1000 africa                                
+
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> SELECT FRUIT_NAME, PRICE, LOC FROM FRUIT;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+mango                               12000 africa                                
+
+SQL> --ÐÐÐ ÐÐÐÐ ÐÐÐ, ÐÐ ÐÐÐÐ ÐÐÐ ÐÐÐ 
+SQL> --PPP PPP PPP PP
+SQL> UPDATE  FRUIT  SET PRICE=1000 WHERE FRUIT_NAME='kiwi';
+
+1 row updated.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 1000 aust                                  
+mango                               12000 africa                                
+
+SQL> --ppp pppp pppp ppppp
+SQL> update fruit set loc='japan' where loc='korea';
+
+1 row updated.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 japan                                 
+graph                               20000 france                                
+kiwi                                 1000 aust                                  
+mango                               12000 africa                                
+
+SQL> --àààà ààà àà
+SQL> --
+SQL> delete fruit;
+
+4 rows deleted.
+
+SQL> rollback;
+
+Rollback complete.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+mango                               12000 africa                                
+
+SQL> delete fruit where fruit_name='mango';
+
+1 row deleted.
+
+SQL> select * from fruit;
+
+FRUIT_NAME                          PRICE LOC                                   
+------------------------------ ---------- ------------------------------        
+apple                                5000 korea                                 
+graph                               20000 france                                
+kiwi                                 8000 aust                                  
+
+SQL> spool off
