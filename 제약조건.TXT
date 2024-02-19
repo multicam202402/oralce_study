@@ -1,0 +1,437 @@
+SQL> --테이블 생성시, 올바른 데이터만을 받아들이기 위해 컬럼에 제약(CONSTRAINT)
+SQL> --가하는 까다로운 조건을 말한다
+SQL> --즉 결점이 없는 데이터만을 받아들이기 위한 제한 조건을 말한다
+SQL> --UNIQUE 제약조건
+SQL> --중복된 값을 허용하지 않는 제약조건
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --유저가 기억나지 않으면? 시스템 테이블을 조회하면 된다. 이러한 시스템
+SQL> --테이블을 가리켜 오라클에서는 딕셔너리라 한다
+SQL> --수백여가지나 되므로,암기 힘들다. 따라서 명명규칙을 알아놓자
+SQL> --접속자가 관리자이면 'DBA_객체명' , 일반사용자이면 'USER_객체명'
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> DESC DBA_USERS;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ USERNAME                                  NOT NULL VARCHAR2(30)
+ USER_ID                                   NOT NULL NUMBER
+ PASSWORD                                           VARCHAR2(30)
+ ACCOUNT_STATUS                            NOT NULL VARCHAR2(32)
+ LOCK_DATE                                          DATE
+ EXPIRY_DATE                                        DATE
+ DEFAULT_TABLESPACE                        NOT NULL VARCHAR2(30)
+ TEMPORARY_TABLESPACE                      NOT NULL VARCHAR2(30)
+ CREATED                                   NOT NULL DATE
+ PROFILE                                   NOT NULL VARCHAR2(30)
+ INITIAL_RSRC_CONSUMER_GROUP                        VARCHAR2(30)
+ EXTERNAL_NAME                                      VARCHAR2(4000)
+ PASSWORD_VERSIONS                                  VARCHAR2(8)
+ EDITIONS_ENABLED                                   VARCHAR2(1)
+ AUTHENTICATION_TYPE                                VARCHAR2(8)
+
+SQL> --조사된 컬럼 중 원하는 것만 골라쓰자
+SQL> SELECT USERNAME FROM DBA_USERS;
+
+USERNAME                                                                        
+------------------------------------------------------------                    
+SYS                                                                             
+SYSTEM                                                                          
+ANONYMOUS                                                                       
+TEST                                                                            
+BATMAN                                                                          
+APEX_PUBLIC_USER                                                                
+FLOWS_FILES                                                                     
+APEX_040000                                                                     
+OUTLN                                                                           
+DIP                                                                             
+ORACLE_OCM                                                                      
+
+USERNAME                                                                        
+------------------------------------------------------------                    
+XS$NULL                                                                         
+MDSYS                                                                           
+CTXSYS                                                                          
+DBSNMP                                                                          
+XDB                                                                             
+APPQOSSYS                                                                       
+HR                                                                              
+
+18 rows selected.
+
+SQL> --BATMAN으로 접속을 해보자
+SQL> CONN BATMAN/1234
+Connected.
+SQL> --어떤 테이블을 보유하고 있을까? 기억하지 못하면 딕셔너리 조회
+SQL> --현재 유저가 일반인이면, USER_~~~
+SQL> SHOW USER
+USER is "BATMAN"
+SQL> DESC USER_TABLES;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TABLE_NAME                                NOT NULL VARCHAR2(30)
+ TABLESPACE_NAME                                    VARCHAR2(30)
+ CLUSTER_NAME                                       VARCHAR2(30)
+ IOT_NAME                                           VARCHAR2(30)
+ STATUS                                             VARCHAR2(8)
+ PCT_FREE                                           NUMBER
+ PCT_USED                                           NUMBER
+ INI_TRANS                                          NUMBER
+ MAX_TRANS                                          NUMBER
+ INITIAL_EXTENT                                     NUMBER
+ NEXT_EXTENT                                        NUMBER
+ MIN_EXTENTS                                        NUMBER
+ MAX_EXTENTS                                        NUMBER
+ PCT_INCREASE                                       NUMBER
+ FREELISTS                                          NUMBER
+ FREELIST_GROUPS                                    NUMBER
+ LOGGING                                            VARCHAR2(3)
+ BACKED_UP                                          VARCHAR2(1)
+ NUM_ROWS                                           NUMBER
+ BLOCKS                                             NUMBER
+ EMPTY_BLOCKS                                       NUMBER
+ AVG_SPACE                                          NUMBER
+ CHAIN_CNT                                          NUMBER
+ AVG_ROW_LEN                                        NUMBER
+ AVG_SPACE_FREELIST_BLOCKS                          NUMBER
+ NUM_FREELIST_BLOCKS                                NUMBER
+ DEGREE                                             VARCHAR2(40)
+ INSTANCES                                          VARCHAR2(40)
+ CACHE                                              VARCHAR2(20)
+ TABLE_LOCK                                         VARCHAR2(8)
+ SAMPLE_SIZE                                        NUMBER
+ LAST_ANALYZED                                      DATE
+ PARTITIONED                                        VARCHAR2(3)
+ IOT_TYPE                                           VARCHAR2(12)
+ TEMPORARY                                          VARCHAR2(1)
+ SECONDARY                                          VARCHAR2(1)
+ NESTED                                             VARCHAR2(3)
+ BUFFER_POOL                                        VARCHAR2(7)
+ FLASH_CACHE                                        VARCHAR2(7)
+ CELL_FLASH_CACHE                                   VARCHAR2(7)
+ ROW_MOVEMENT                                       VARCHAR2(8)
+ GLOBAL_STATS                                       VARCHAR2(3)
+ USER_STATS                                         VARCHAR2(3)
+ DURATION                                           VARCHAR2(15)
+ SKIP_CORRUPT                                       VARCHAR2(8)
+ MONITORING                                         VARCHAR2(3)
+ CLUSTER_OWNER                                      VARCHAR2(30)
+ DEPENDENCIES                                       VARCHAR2(8)
+ COMPRESSION                                        VARCHAR2(8)
+ COMPRESS_FOR                                       VARCHAR2(12)
+ DROPPED                                            VARCHAR2(3)
+ READ_ONLY                                          VARCHAR2(3)
+ SEGMENT_CREATED                                    VARCHAR2(3)
+ RESULT_CACHE                                       VARCHAR2(7)
+
+SQL> SELECT TABLE_NAME FROM USER_TABLES;
+
+TABLE_NAME                                                                      
+------------------------------------------------------------                    
+MEMBER                                                                          
+FRUIT                                                                           
+FRUIT2                                                                          
+DEPT                                                                            
+EMP                                                                             
+EMP2                                                                            
+
+6 rows selected.
+
+SQL> --테이블을 만들면서, 컬럼에 까다로운 조건을 부여해보자
+SQL> --왜?? 무결성 데이터만 받아들이려고...
+SQL> --유일하지 않으면 에러를 발생시키는 제약조건을 사용해보자 UNIQUE 제약조건
+SQL> CREATE  TABLE  MEMBER2(
+  2   NAME  VARCHAR2(20),
+  3   ID VARCHAR2(20)
+  4  , PASS VARCHAR2(20)
+  5  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER2(NAME, ID, PASS) VALUES('A','B','11');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME, ID, PASS) VALUES('SCOTT','B','1134');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER2;
+
+NAME                                                                            
+----------------------------------------                                        
+ID                                                                              
+----------------------------------------                                        
+PASS                                                                            
+----------------------------------------                                        
+A                                                                               
+B                                                                               
+11                                                                              
+                                                                                
+SCOTT                                                                           
+B                                                                               
+1134                                                                            
+
+NAME                                                                            
+----------------------------------------                                        
+ID                                                                              
+----------------------------------------                                        
+PASS                                                                            
+----------------------------------------                                        
+                                                                                
+
+SQL> SET LINESIZE 200
+SQL> /
+
+NAME                                     ID                                       PASS                                                                                                                  
+---------------------------------------- ---------------------------------------- ----------------------------------------                                                                              
+A                                        B                                        11                                                                                                                    
+SCOTT                                    B                                        1134                                                                                                                  
+
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> --UNIQUE 제약조건을 부여해보자
+SQL> CREATE  TABLE MEMBER2(
+  2  NAME VARCHAR2(20)
+  3  , ID VARCHAR2(20) UNIQUE
+  4  , PASS VARCHAR2(20)
+  5  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER2(NAME, ID, PASS) VALUES('SCOTT','B','1134');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME, ID, PASS) VALUES('ADAMS','B','1134');
+INSERT INTO MEMBER2(NAME, ID, PASS) VALUES('ADAMS','B','1134')
+*
+ERROR at line 1:
+ORA-00001: unique constraint (BATMAN.SYS_C007015) violated 
+
+
+SQL> SELECT * FROM MEMBER2;
+
+NAME                                     ID                                       PASS                                                                                                                  
+---------------------------------------- ---------------------------------------- ----------------------------------------                                                                              
+SCOTT                                    B                                        1134                                                                                                                  
+
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> SELECT * FROM EMP;
+
+     EMPNO ENAME                JOB                       MGR HIREDATE        SAL       COMM     DEPTNO                                                                                                 
+---------- -------------------- ------------------ ---------- -------- ---------- ---------- ----------                                                                                                 
+      7369 SMITH                CLERK                    7902 80/12/17        800                    20                                                                                                 
+      7499 ALLEN                SALESMAN                 7698 81/02/20       1600        300         30                                                                                                 
+      7521 WARD                 SALESMAN                 7698 81/02/22       1250        500         30                                                                                                 
+      7566 JONES                MANAGER                  7839 81/04/02       2975                    20                                                                                                 
+      7654 MARTIN               SALESMAN                 7698 81/09/28       1250       1400         30                                                                                                 
+      7698 BLAKE                MANAGER                  7839 81/05/01       2850                    30                                                                                                 
+      7782 CLARK                MANAGER                  7839 81/06/09       2450                    10                                                                                                 
+      7788 SCOTT                ANALYST                  7566 87/04/19       3000                    20                                                                                                 
+      7839 KING                 PRESIDENT                     81/11/17       5000                    10                                                                                                 
+      7844 TURNER               SALESMAN                 7698 81/09/08       1500          0         30                                                                                                 
+      7876 ADAMS                CLERK                    7788 87/05/23       1100                    20                                                                                                 
+
+     EMPNO ENAME                JOB                       MGR HIREDATE        SAL       COMM     DEPTNO                                                                                                 
+---------- -------------------- ------------------ ---------- -------- ---------- ---------- ----------                                                                                                 
+      7900 JAMES                CLERK                    7698 81/12/03        950                    30                                                                                                 
+      7902 FORD                 ANALYST                  7566 81/12/03       3000                    20                                                                                                 
+      7934 MILLER               CLERK                    7782 82/01/23       1300                    10                                                                                                 
+
+14 rows selected.
+
+SQL> --2.Not null 제약조건  null은 아무런 데이터가 들어잇지 않을때의 의미
+SQL> -- db 설계분야에서 null은 레코드 입력시 넣어서는 안됨 ...
+SQL> -- null 사용을 지양하고, 테이블 설계로 보완하는게 좋다..
+SQL> CREATE TABLE MEMBER2(
+  2  NAME VARCHAR2(20) NOT NULL
+  3  , ID VARCHAR2(20) UNIQUE
+  4  , PASS VARCHAR2(20)
+  5  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER2(ID,PASS) VALUES('KK','1234');
+INSERT INTO MEMBER2(ID,PASS) VALUES('KK','1234')
+*
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("BATMAN"."MEMBER2"."NAME") 
+
+
+SQL> SELECT * FROM MEMBER2;
+
+no rows selected
+
+SQL> --3.DEFAULT  제약조건
+SQL> SELECT * FROM MEMBER2;
+
+no rows selected
+
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> --회원 가입시 무조건 5000을 기본으로 포인트가 존재하는 앱
+SQL> CREATE TABLE  MEMBER2(
+  2  NAME VARCHAR2(20) NOT NULL
+  3  , ID VARCHAR2(20) UNIQUE
+  4  , PASS VARCHAR2(20)
+  5  , POINT NUMBER DEFAULT 5000
+  6  , REGDATE  DATE  DEFAULT  SYSDATE
+  7  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER2(NAME,ID,PASS) VALUES('ZINO','TIGER','1234');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER2;
+
+NAME                                     ID                                       PASS                                          POINT REGDATE                                                           
+---------------------------------------- ---------------------------------------- ---------------------------------------- ---------- --------                                                          
+ZINO                                     TIGER                                    1234                                           5000 24/02/19                                                          
+
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> --4.CHECK 제약조건 지정된 조건만  허용하는 제약조건
+SQL> CREATE TABLE MEMBER2(
+  2  NAME VARCHAR2(20) NOT NULL
+  3  , ID VARCHAR2(20) UNIQUE NOT NULL
+  4  , AGE NUMBER CHECK (AGE>=18)
+  5  );
+
+Table created.
+
+SQL> INSERT INTO MEMBERT2(NAME, ID, AGE) VALUES('ZINO','AA',17);
+INSERT INTO MEMBERT2(NAME, ID, AGE) VALUES('ZINO','AA',17)
+            *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> INSERT INTO MEMBERT(NAME, ID, AGE) VALUES('ZINO','AA',17);
+INSERT INTO MEMBERT(NAME, ID, AGE) VALUES('ZINO','AA',17)
+            *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> INSERT INTO MEMBER2(NAME, ID, AGE) VALUES('ZINO','AA',17);
+INSERT INTO MEMBER2(NAME, ID, AGE) VALUES('ZINO','AA',17)
+*
+ERROR at line 1:
+ORA-02290: check constraint (BATMAN.SYS_C007022) violated 
+
+
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> --PRIMARY KEY 제약조건
+SQL> --유일하면서(중복불허),NULL도 허용하지 않는 제약조건
+SQL> --UNIQUE + NOT NULL
+SQL> CREATE TABLE MEMBER2(
+  2  ID VARCHAR2(20)
+  3  , NAME VARCHAR2(20) NOT NULL
+  4  , PASS VARCHAR2(20) UNIQUE
+  5  , REGDATE  DATE DEFAULT SYSDATE
+  6  );
+
+Table created.
+
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> --과연 UNIQUE 만으로 유일한 레코드를 보장할 수 있나?
+SQL> CREATE TABLE  MEMBER2(
+  2  ID VARCHAR2(20) UNIQUE
+  3  , NAME VARCHAR2(20) NOT NULL
+  4  , REGDATE  DATE  DEFAULT SYSDATE
+  5  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER2(ID, NAME) VALUES('KING','SCOTT');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(ID, NAME) VALUES('KING','ADAMS');
+INSERT INTO MEMBER2(ID, NAME) VALUES('KING','ADAMS')
+*
+ERROR at line 1:
+ORA-00001: unique constraint (BATMAN.SYS_C007027) violated 
+
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('ADAMS');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('ADAMS');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('ADAMS');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('ADAMS');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('ADAMS');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('ADAMS');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER2;
+
+ID                                       NAME                                     REGDATE                                                                                                               
+---------------------------------------- ---------------------------------------- --------                                                                                                              
+KING                                     SCOTT                                    24/02/19                                                                                                              
+                                         ADAMS                                    24/02/19                                                                                                              
+                                         ADAMS                                    24/02/19                                                                                                              
+                                         ADAMS                                    24/02/19                                                                                                              
+                                         ADAMS                                    24/02/19                                                                                                              
+                                         ADAMS                                    24/02/19                                                                                                              
+                                         ADAMS                                    24/02/19                                                                                                              
+
+7 rows selected.
+
+SQL> --결론 UNIQUE 제약조건은 NULL 허용해버린다..
+SQL> --PRIMARY KEY = UNIQUE + NOT NULL
+SQL> DROP TABLE MEMBER2;
+
+Table dropped.
+
+SQL> CREATE TABLE MEMBER2(
+  2  ID VARCHAR2(20) PRIMARY KEY
+  3  , NAME VARCHAR2(20) NOT NULL
+  4  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER2(ID, NAME) VALUES('QUEEN','SCOTT');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER2(NAME) VALUES('SCOTT');
+INSERT INTO MEMBER2(NAME) VALUES('SCOTT')
+*
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("BATMAN"."MEMBER2"."ID") 
+
+
+SQL> SPOOL OFF
