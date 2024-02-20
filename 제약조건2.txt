@@ -1,0 +1,376 @@
+SQL> --제약조건이란? 컬럼에 가하는 제한사항
+SQL> --그렇다면 제한을 왜 가하나?
+SQL> --무결성 데이터만 허용하기 위해
+SQL> --중복을 허용하지 않는 제약조건 : unique
+SQL> --null 을 허용하지 않는 제약조건 : not null
+SQL> --기본값을 제약조건 : default
+SQL> --조건으로 지정된 값만 허용하는 제약조건: check
+SQL> --unique + not null : primary key
+SQL> show user
+USER is "SYSTEM"
+SQL> conn batman/1234
+Connected.
+SQL> --현재 접속한 유저가 보유한 테이블 목록 보기
+SQL> --딕셔너리 이용하자
+SQL> desc user_tables;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TABLE_NAME                                NOT NULL VARCHAR2(30)
+ TABLESPACE_NAME                                    VARCHAR2(30)
+ CLUSTER_NAME                                       VARCHAR2(30)
+ IOT_NAME                                           VARCHAR2(30)
+ STATUS                                             VARCHAR2(8)
+ PCT_FREE                                           NUMBER
+ PCT_USED                                           NUMBER
+ INI_TRANS                                          NUMBER
+ MAX_TRANS                                          NUMBER
+ INITIAL_EXTENT                                     NUMBER
+ NEXT_EXTENT                                        NUMBER
+ MIN_EXTENTS                                        NUMBER
+ MAX_EXTENTS                                        NUMBER
+ PCT_INCREASE                                       NUMBER
+ FREELISTS                                          NUMBER
+ FREELIST_GROUPS                                    NUMBER
+ LOGGING                                            VARCHAR2(3)
+ BACKED_UP                                          VARCHAR2(1)
+ NUM_ROWS                                           NUMBER
+ BLOCKS                                             NUMBER
+ EMPTY_BLOCKS                                       NUMBER
+ AVG_SPACE                                          NUMBER
+ CHAIN_CNT                                          NUMBER
+ AVG_ROW_LEN                                        NUMBER
+ AVG_SPACE_FREELIST_BLOCKS                          NUMBER
+ NUM_FREELIST_BLOCKS                                NUMBER
+ DEGREE                                             VARCHAR2(40)
+ INSTANCES                                          VARCHAR2(40)
+ CACHE                                              VARCHAR2(20)
+ TABLE_LOCK                                         VARCHAR2(8)
+ SAMPLE_SIZE                                        NUMBER
+ LAST_ANALYZED                                      DATE
+ PARTITIONED                                        VARCHAR2(3)
+ IOT_TYPE                                           VARCHAR2(12)
+ TEMPORARY                                          VARCHAR2(1)
+ SECONDARY                                          VARCHAR2(1)
+ NESTED                                             VARCHAR2(3)
+ BUFFER_POOL                                        VARCHAR2(7)
+ FLASH_CACHE                                        VARCHAR2(7)
+ CELL_FLASH_CACHE                                   VARCHAR2(7)
+ ROW_MOVEMENT                                       VARCHAR2(8)
+ GLOBAL_STATS                                       VARCHAR2(3)
+ USER_STATS                                         VARCHAR2(3)
+ DURATION                                           VARCHAR2(15)
+ SKIP_CORRUPT                                       VARCHAR2(8)
+ MONITORING                                         VARCHAR2(3)
+ CLUSTER_OWNER                                      VARCHAR2(30)
+ DEPENDENCIES                                       VARCHAR2(8)
+ COMPRESSION                                        VARCHAR2(8)
+ COMPRESS_FOR                                       VARCHAR2(12)
+ DROPPED                                            VARCHAR2(3)
+ READ_ONLY                                          VARCHAR2(3)
+ SEGMENT_CREATED                                    VARCHAR2(3)
+ RESULT_CACHE                                       VARCHAR2(7)
+
+SQL> select TABLE_NAME from user_tables;
+
+TABLE_NAME                                                                      
+------------------------------------------------------------                    
+MEMBER                                                                          
+FRUIT                                                                           
+FRUIT2                                                                          
+DEPT                                                                            
+EMP                                                                             
+EMP2                                                                            
+MEMBER2                                                                         
+
+7 rows selected.
+
+SQL> --primary key의 주용도 이해하기
+SQL> CREATE  TABLE  MEMBER3(
+  2      ID  VARCHAR2(20)
+  3    , NAME VARCHAR2(20)
+  4    , AGE NUMBER
+  5  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER3(ID, NAME ,AGE) VALUES('CAT','AAA',3);
+
+1 row created.
+
+SQL> INSERT INTO MEMBER3(ID, NAME ,AGE) VALUES('CAT','AAA',3);
+
+1 row created.
+
+SQL> INSERT INTO MEMBER3(ID, NAME ,AGE) VALUES('CAT','AAA',3);
+
+1 row created.
+
+SQL> --제약조건을 부여하지 않은 테이블이므로, 무결성 데이터를 보장하지못함
+SQL> SELECT * FROM MEMBER3;
+
+ID                                                                              
+----------------------------------------                                        
+NAME                                            AGE                             
+---------------------------------------- ----------                             
+CAT                                                                             
+AAA                                               3                             
+                                                                                
+CAT                                                                             
+AAA                                               3                             
+                                                                                
+CAT                                                                             
+AAA                                               3                             
+                                                                                
+
+SQL> SET LINESIZE 200
+SQL> /
+
+ID                                       NAME                                            AGE                                                                                                            
+---------------------------------------- ---------------------------------------- ----------                                                                                                            
+CAT                                      AAA                                               3                                                                                                            
+CAT                                      AAA                                               3                                                                                                            
+CAT                                      AAA                                               3                                                                                                            
+
+SQL> --모든 데이터가 중복되어 잇는 레코드를 대상으로, 특정 레코드만 골라서
+SQL> --업무를 처리할 수 잇는가? 없다!!
+SQL> --해결책) 레코드 간 구분을 위한 컬럼을 존재시키되, 해당 컬럼은
+SQL> --레코드의 유일성을 보장해야 하기 때문에,  중복허용x, NULLx
+SQL> --따라서 위의 두가지 제한 조건을 만족시키는 제약조건은 PRIMARY KEY
+SQL> --제약조건이다
+SQL> CREATE  TABLE  MEMBER4(
+  2   MEMBER4_IDX NUMBER PRIMARY KEY
+  3  , ID VARCHAR2(20) UNIQUE
+  4  , NAME VARCHAR2(20) NOT NULL
+  5  , REGDATE  DATE  DEFAULT SYSDATE
+  6  , POINT NUMBER DEFAULT 5000
+  7  );
+
+Table created.
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(1, 'CAT', 'AAA');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          1 CAT                                      AAA                                      24/02/20       5000                                                                                       
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(1, 'DOG', 'BBB');
+INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (BATMAN.SYS_C007031) violated 
+
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(2,'DOG','BBB');
+
+1 row created.
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  ;
+
+*
+ERROR at line 2:
+ORA-00926: missing VALUES keyword 
+
+
+SQL> --숫자형으로 된 PRIMARY KEY 값을 넣을때는 개발자가 원하는 값을 넣으면
+SQL> --안되고, 유일성을 보장해야 하기 때문에 시스템을 통해 얻어와야 한다
+SQL> --오라클 객체 중, 오직 유일한 숫자값만을 관리하는 객체가 있는데,
+SQL> --이 객체를 가리켜 SEQUENCE 라 한다..
+SQL> CREATE  SEQUENCE  SEQ_MEMBER4
+  2  START WITH 1
+  3  INCREMENT BY 1;
+CREATE  SEQUENCE  SEQ_MEMBER4
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> --오라클은 보안이 강력하므로, 모든 객체에 대한 예) 테이블, 시퀀스, 뷰 등
+SQL> --에 대해 별도의 권한이 잇어야 한다
+SQL> --SYSTEM으로 로그인을 전환하여 권한을 취득해보자
+SQL> SHOW USER
+USER is "BATMAN"
+SQL> CONN SYSTEM/1234
+Connected.
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> --SQL문의 종류는 업무에 따라 3가지 유형으로 나뉨
+SQL> --DDL : 데이터 정의어 (탄생 CREATE ,죽음 DROP , 변경 ALTER)
+SQL> --DML : INSERT, UPDATE, DELETE, SELECT
+SQL> --DCL : DATABASE CONTROL LANGUAGE : 권한을 부여 GRANT, 뺏는 REVOKE
+SQL> GRANT CREATE  SEQUENCE  TO BATMAN;
+
+Grant succeeded.
+
+SQL> --다시 BATMAN  으로 전환하자
+SQL> CREATE  SEQUENCE  SEQ_MEMBER4
+  2  START WITH 1
+  3  INCREMENT BY 1;
+
+Sequence created.
+
+SQL> --현재 계정이 보유한 시퀀스 들 조회
+SQL> --딕셔너리 를 조회하면 됨
+SQL> --BATMAN 일반 계정이므로 USER_ 로 시작하는 딕셔너리를 조회
+SQL> DESC USER_SEQUENCES;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ SEQUENCE_NAME                                                                                                     NOT NULL VARCHAR2(30)
+ MIN_VALUE                                                                                                                  NUMBER
+ MAX_VALUE                                                                                                                  NUMBER
+ INCREMENT_BY                                                                                                      NOT NULL NUMBER
+ CYCLE_FLAG                                                                                                                 VARCHAR2(1)
+ ORDER_FLAG                                                                                                                 VARCHAR2(1)
+ CACHE_SIZE                                                                                                        NOT NULL NUMBER
+ LAST_NUMBER                                                                                                       NOT NULL NUMBER
+
+SQL> --DESC 를 이용하여 컬럼명을 알아냈으니, 해당 컬럼명을 이용한
+SQL> --레코드 조회하자
+SQL> SELECT SEQUENCE_NAME FROM USER_SEQUENCES;
+
+SEQUENCE_NAME                                                                                                                                                                                           
+------------------------------------------------------------                                                                                                                                            
+LOGMNR_EVOLVE_SEQ$                                                                                                                                                                                      
+LOGMNR_SEQ$                                                                                                                                                                                             
+LOGMNR_UIDS$                                                                                                                                                                                            
+MVIEW$_ADVSEQ_GENERIC                                                                                                                                                                                   
+MVIEW$_ADVSEQ_ID                                                                                                                                                                                        
+REPCAT$_EXCEPTIONS_S                                                                                                                                                                                    
+REPCAT$_FLAVORS_S                                                                                                                                                                                       
+REPCAT$_FLAVOR_NAME_S                                                                                                                                                                                   
+REPCAT$_REFRESH_TEMPLATES_S                                                                                                                                                                             
+REPCAT$_REPPROP_KEY                                                                                                                                                                                     
+REPCAT$_RUNTIME_PARMS_S                                                                                                                                                                                 
+
+SEQUENCE_NAME                                                                                                                                                                                           
+------------------------------------------------------------                                                                                                                                            
+REPCAT$_TEMPLATE_OBJECTS_S                                                                                                                                                                              
+REPCAT$_TEMPLATE_PARMS_S                                                                                                                                                                                
+REPCAT$_TEMPLATE_REFGROUPS_S                                                                                                                                                                            
+REPCAT$_TEMPLATE_SITES_S                                                                                                                                                                                
+REPCAT$_TEMP_OUTPUT_S                                                                                                                                                                                   
+REPCAT$_USER_AUTHORIZATIONS_S                                                                                                                                                                           
+REPCAT$_USER_PARM_VALUES_S                                                                                                                                                                              
+REPCAT_LOG_SEQUENCE                                                                                                                                                                                     
+SEQ_MEMBER4                                                                                                                                                                                             
+TEMPLATE$_TARGETS_S                                                                                                                                                                                     
+
+21 rows selected.
+
+SQL> --시퀀스를 이용하여 PK 값을 넣어보자
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(SEQ_MEMBER4.NEXTVAL, 'CAT','CCC');
+INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+            *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> CONN BATMAN/1234
+Connected.
+SQL> --시퀀스 다시 만드릭
+SQL> CREATE SEQUENCE  SEQ_MEMBER4
+  2  INCREMENT BY 1
+  3  START WITH 1;
+
+Sequence created.
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(SEQ_MEMBER4.NEXTVAL, 'CAT','CCC');
+INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (BATMAN.SYS_C007031) violated 
+
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          1 CAT                                      AAA                                      24/02/20       5000                                                                                       
+          2 DOG                                      BBB                                      24/02/20       5000                                                                                       
+
+SQL> --테이블 생성시 반드시 PK 를 정의하자
+SQL> DELETE MEMBER4;
+
+2 rows deleted.
+
+SQL> --모든 레코드를 지움으로써 중복 문제를 해결
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(SEQ_MEMBER4.NEXTVAL, 'CAT','CCC');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          2 CAT                                      CCC                                      24/02/20       5000                                                                                       
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(SEQ_MEMBER4.NEXTVAL, 'DOG','AAA');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER3;
+
+ID                                       NAME                                            AGE                                                                                                            
+---------------------------------------- ---------------------------------------- ----------                                                                                                            
+CAT                                      AAA                                               3                                                                                                            
+CAT                                      AAA                                               3                                                                                                            
+CAT                                      AAA                                               3                                                                                                            
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          2 CAT                                      CCC                                      24/02/20       5000                                                                                       
+          3 DOG                                      AAA                                      24/02/20       5000                                                                                       
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(SEQ_MEMBER4.NEXTVAL, 'EAGLE','EEE');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          2 CAT                                      CCC                                      24/02/20       5000                                                                                       
+          3 DOG                                      AAA                                      24/02/20       5000                                                                                       
+          4 EAGLE                                    EEE                                      24/02/20       5000                                                                                       
+
+SQL> DELETE MEMBER4 WHERE MEMBER4_IDX=3;
+
+1 row deleted.
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          2 CAT                                      CCC                                      24/02/20       5000                                                                                       
+          4 EAGLE                                    EEE                                      24/02/20       5000                                                                                       
+
+SQL> INSERT INTO MEMBER4(MEMBER4_IDX, ID, NAME)
+  2  VALUES(SEQ_MEMBER4.NEXTVAL, 'DUCK','DDD');
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER4;
+
+MEMBER4_IDX ID                                       NAME                                     REGDATE       POINT                                                                                       
+----------- ---------------------------------------- ---------------------------------------- -------- ----------                                                                                       
+          2 CAT                                      CCC                                      24/02/20       5000                                                                                       
+          4 EAGLE                                    EEE                                      24/02/20       5000                                                                                       
+          5 DUCK                                     DDD                                      24/02/20       5000                                                                                       
+
+SQL> SPOOL OFF
