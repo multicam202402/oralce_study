@@ -1,0 +1,69 @@
+[제약조건]
+
+1.뜻?  무결성 데이터를 받기 위한 컬럼에 가하는 조건, 제약사항 
+2.종류? 
+   unique : 중복을 허용하지 않는 제약조건 
+   not null : null을 허용하지 않는 제약조건 
+   default  : 기본값을 지정하는 제약조건 
+   check :  지정된 조건만 허용하는 제약조건 
+   primary key : unique + not null 
+   foreign key : 정규화, 조인 배울때 진행함 
+
+3.제약조건의 이름을 부여할 수 있다.. 
+
+  use  jsdb; //데이터베이스 선택 
+  show tables; //존재하는 테이블 목록 
+
+mysql은 시퀀스가 별도로 지원되지 않음 
+따라서 컬럼에 숫자값을 자동증가시켜주는
+속성을 지원함 auto_increment 
+개발자가 넣지 않고, 자동으로 넣어줌 
+
+create  table  member5(
+   member5_idx  int  primary key auto_increment
+ , id  varchar(20)
+ , age  int 
+ , constraint  chk_age  check(age>=18)
+);
+위와 같이 제약조건을 부여하면서 이름을 선언하면
+추후 제약조건을 제거도 쉽게 할 수 있다..
+
+체크 제약조건이 제대로 동작하는지 테스트해보자
+
+insert into member5(id, age)  values('pica', 3);
+
+--------------------------------------------------------
+오라클에서 명령어 
+CREATE  TABLE   MEMBER7(
+   member7_idx  number  primary key 
+  , id  varchar2(20) 
+  , age  number 
+  , contstraint  ch_age  check (age>=18)
+);
+
+member7 테이블에 사용할 시퀀스 정의 
+
+create  sequence  seq_member7
+increment by 1
+start with 1;
+
+insert into member7( member7_idx, id, age) 
+values(seq_member7.nextval, 'aaa', 13);
+
+위의 insert 는 체크 제약 조건에 위배될 것이므로, insert 불가 
+
+때로는 테스트 목적으로 제약조건을 삭제하기도 해야 함 
+
+ALTER  TABLE  MEMBER7
+DROP  CONSTRAINT  CH_AGE;
+
+insert into member7( member7_idx, id, age) 
+values(seq_member7.nextval, 'aaa', 13);
+
+
+
+
+
+
+
+
