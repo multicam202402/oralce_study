@@ -1,0 +1,35 @@
+SQL> --회원 테이블을 만들어보자
+SQL> desc member;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NAME                                               VARCHAR2(20)
+ PHONE                                              VARCHAR2(13)
+ AREA                                               VARCHAR2(20)
+
+SQL> --기존 회원 테이블 제거
+SQL> drop table member;
+
+Table dropped.
+
+SQL> create table nation(
+  2  nation_idx number primary key
+  3  , nation_name varchar2(20)
+  4  );
+
+Table created.
+
+SQL> create table member(
+  2  member_idx number primary key
+  3  , name varchar2(20)
+  4  , gender varchar2(5)
+  5  , nation_idx number
+  6  , constraint  fk_nation_member foreign key(nation_idx)
+  7     references nation(nation_idx)
+  8  );
+create table member(
+*
+ERROR at line 1:
+ORA-01658: unable to create INITIAL extent for segment in tablespace MYSPACE 
+
+
+SQL> spool off
