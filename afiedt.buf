@@ -1,0 +1,4 @@
+CREATE TABLESPACE SPACE0228
+DATAFILE 'D:\oraclexe\app\oracle\oradata\XE\SPACE0228.DBF'
+SIZE 5M
+/

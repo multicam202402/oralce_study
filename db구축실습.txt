@@ -1,0 +1,141 @@
+SQL> CREATE  TABLESPACE  TESTSPACE
+  2  ;
+
+*
+ERROR at line 2:
+ORA-02199: missing DATAFILE/TEMPFILE clause 
+
+
+SQL> CREATE TABLESPACE SPACE0228
+  2  DATFILE 'D:\oraclexe\app\oracle\oradata\XE\SPACE0228.DBF'
+  3  SIZE 5M;
+DATFILE 'D:\oraclexe\app\oracle\oradata\XE\SPACE0228.DBF'
+*
+ERROR at line 2:
+ORA-02180: invalid option for CREATE TABLESPACE 
+
+
+SQL> ED
+Wrote file afiedt.buf
+
+  1  CREATE TABLESPACE SPACE0228
+  2  DATAFILE 'D:\oraclexe\app\oracle\oradata\XE\SPACE0228.DBF'
+  3* SIZE 5M
+SQL> /
+
+Tablespace created.
+
+SQL> CREATE USER  TESTUSER
+  2  IDENTIFIED BY 1234
+  3  DEFAULT TABLESPACE  SPACE0228
+  4  QUOTA  UNLIMITED  ON SPACE0228;
+
+User created.
+
+SQL> --권한 부여 (접속, 테이블, 시퀀스 )
+SQL> GRANT  CREATE SESSION, CREATE TABLE, CREATE SEQUENCE
+  2  TO TESTUSER;
+
+Grant succeeded.
+
+SQL> SHOW USER
+USER is "SYSTEM"
+SQL> CONN TESTUSER/1234
+Connected.
+SQL> SHOW USER
+USER is "TESTUSER"
+SQL> --테이블새엇ㅇ
+SQL> CREATE  TABLE  MEMBER(
+  2  MEMBER_IDX  NUMBER PRIMARY KEY
+  3  , NAME VARCHAR2(20)
+  4  , PHONE  VARCHAR2(13)
+  5  , AGE NUMBER
+  6  , REGDATE  DATE DEFAULT SYSDATE
+  7  );
+
+Table created.
+
+SQL> CREATE  SEQUENCE SEQ_MEMBER
+  2  START WITH 1
+  3  INCREMENT BY 1;
+
+Sequence created.
+
+SQL> INSERT INTO MEMBER(MEMBER_IDX, NAME, PHONE, AGE)
+  2  VALUES(SEQ_MEMBER.NEXTVAL, 'JAMES', '010',23);
+
+1 row created.
+
+SQL> --트랜잭션 진행 중 , DDL 실행하면 그 즉시 현재까지의 트랜잭션은  COMMIT 된다
+SQL> DELETE MEMBER;
+
+1 row deleted.
+
+SQL> SELECT * FROM MEMBER;
+
+no rows selected
+
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> SELECT * FROM MEMBER;
+
+no rows selected
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> INSERT INTO MEMBER(MEMBER_IDX, NAME, PHONE, AGE)
+  2  VALUES(SEQ_MEMBER.NEXTVAL, 'JAMES', '010',23);
+
+1 row created.
+
+SQL> SELECT * FROM MEMBER;
+
+MEMBER_IDX NAME                                     PHONE                       
+---------- ---------------------------------------- --------------------------  
+       AGE REGDATE                                                              
+---------- --------                                                             
+         2 JAMES                                    010                         
+        23 24/02/28                                                             
+                                                                                
+
+SQL> DELETE MEMBER;
+
+1 row deleted.
+
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> SELECT * FROM MEMBER;
+
+no rows selected
+
+SQL> SELECT * FROM MEMBER;
+
+no rows selected
+
+SQL> INSERT INTO MEMBER(MEMBER_IDX, NAME, PHONE, AGE)
+  2  VALUES(SEQ_MEMBER.NEXTVAL, 'JAMES', '010',23);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> SELECT * FROM MEMBER;
+
+MEMBER_IDX NAME                                     PHONE                       
+---------- ---------------------------------------- --------------------------  
+       AGE REGDATE                                                              
+---------- --------                                                             
+         3 JAMES                                    010                         
+        23 24/02/28                                                             
+                                                                                
+
+SQL> -- DDL 을 실행하면 트랜잭션이 커밋됨
+SQL> SPOOL OFF
