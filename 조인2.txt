@@ -266,7 +266,7 @@ Wrote file afiedt.buf
   1  SELECT ENAME, SAL , HIREDATE, DNAME
   2  FROM  DEPT D, EMP E 
   3  WHERE  D.DEPTNO = E.DEPTNO
-  4  AND  HIREDATE  > (10번 부서중 최고급여를 받는 사원보다 입사일
+  4  AND  HIREDATE  > (
 
   5       SELECT HIREDATE FROM EMP 
   6       WHERE  SAL = (
@@ -276,15 +276,7 @@ Wrote file afiedt.buf
  10* )             
 SQL> 
 SQL> 
-SQL> 
-SQL> 
-SQL> 
-SQL> /
-AND  HIREDATE  > (10번 부서중 최고급여를 받는 사원보다 입사일
 
-                    *
-ERROR at line 4:
-ORA-00907: missing right parenthesis 
 
 
 SQL> ED
@@ -461,21 +453,12 @@ Wrote file afiedt.buf
   2  FROM DEPT D, EMP E
   3  WHERE D.DEPTNO=E.DEPTNO
   4  AND SAL < (
-  5      커미션 계약을 하지 않은 사원들의 급여의 합
+  5      
 
   6      SELECT SUM(SAL) FROM EMP 
   7      WHERE  COMM IS NULL
   8*  )
-SQL> /
-    커미션 계약을 하지 않은 사원들의 급여의 합
 
-    *
-ERROR at line 5:
-ORA-00972: identifier is too long 
-
-
-SQL> ED
-Wrote file afiedt.buf
 
   1  SELECT SAL, E.DEPTNO, DNAME, LOC
   2  FROM DEPT D, EMP E
